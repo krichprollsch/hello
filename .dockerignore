@@ -1,0 +1,10 @@
+**/.dockerignore
+**/*.log
+**/.git/
+**/.gitattributes
+**/.gitignore
+**/.gitmodules
+**/Dockerfile
+var/
+vendor/
+.env/*
