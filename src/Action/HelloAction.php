@@ -7,6 +7,6 @@ class HelloAction
 {
     public function __invoke()
     {
-        return new Response('Hello world');
+        return new Response('Hello prestahop');
     }
 }
