@@ -17,14 +17,23 @@ docker-network-delete: ## delete the custom docker network
 docker-build-app: ## build the app container using docker
 	docker build --rm --tag $(DOCKER_PREFIX)_app .
 
-docker-run-app: ## start running the app container
-	docker run --rm --detach --network=$(DOCKER_PREFIX)_net --network-alias=blue --name $(DOCKER_PREFIX)_app_1 $(DOCKER_PREFIX)_app
+docker-run-blue: ## start running the app container as blue
+	docker run --rm --detach --network=$(DOCKER_PREFIX)_net --network-alias=blue --name $(DOCKER_PREFIX)_app_blue $(DOCKER_PREFIX)_app
 
-docker-stop-app: ## stop the app container
-	docker stop $(DOCKER_PREFIX)_app_1
+docker-stop-blue: ## stop the blue app container
+	docker stop $(DOCKER_PREFIX)_app_blue
 
-docker-logs-app: ## display the logs from the app container
-	docker logs $(DOCKER_PREFIX)_app_1
+docker-logs-blue: ## display the logs from the blue app container
+	docker logs $(DOCKER_PREFIX)_app_blue
+
+docker-run-green: ## start running the app container as green
+	docker run --rm --detach --network=$(DOCKER_PREFIX)_net --network-alias=green --name $(DOCKER_PREFIX)_app_green $(DOCKER_PREFIX)_app
+
+docker-stop-green: ## stop the green app container
+	docker stop $(DOCKER_PREFIX)_app_green
+
+docker-logs-green: ## display the logs from the green app container
+	docker logs $(DOCKER_PREFIX)_app_green
 
 docker-build-nginx: ## build the nginx container using docker
 	docker build --rm --tag $(DOCKER_PREFIX)_nginx ./docker/nginx
@@ -39,5 +48,11 @@ docker-logs-nginx: ## display the logs from the nginx container
 	docker logs $(DOCKER_PREFIX)_nginx_1
 
 docker-build: docker-build-app docker-build-nginx ## build all the containers
-docker-run: docker-network-create docker-run-app docker-run-nginx ## run all the containers
-docker-stop: docker-stop-app docker-stop-nginx docker-network-delete ## stop all the containers
+
+docker-blue2green:
+	docker exec $(DOCKER_PREFIX)_nginx_1 sed -i -e 's/blue/green/' /etc/nginx/nginx.conf
+	docker kill -s HUP $(DOCKER_PREFIX)_nginx_1
+
+docker-green2blue:
+	docker exec $(DOCKER_PREFIX)_nginx_1 sed -i -e 's/green/blue/' /etc/nginx/nginx.conf
+	docker kill -s HUP $(DOCKER_PREFIX)_nginx_1
